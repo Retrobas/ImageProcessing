@@ -78,9 +78,9 @@
   <ItemGroup>
     <ClCompile Include="..\convolve.c" />
     <ClCompile Include="..\Iplib.c" />
-    <ClCompile Include="..\List2_1.c" />
-    <ClCompile Include="..\LIST2_2.C" />
-    <ClCompile Include="..\LIST3_1.c" />
+    <ClCompile Include="..\lut.c" />
+    <ClCompile Include="..\main.c" />
+    <ClCompile Include="..\histogram.c" />
     <ClCompile Include="..\makeczp.c" />
   </ItemGroup>
   <ItemGroup>

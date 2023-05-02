@@ -1,13 +1,3 @@
-/***************************************************************************
- * File: makeczp.c                                                         *
- *                                                                         *
- * Desc: This program generates circular zone plate image                  *
- *                                                                         *
- *                      phi 2   phi 2                                      *
- * f(x,y) = 127.5(1+cos(---X  + ---Y  ))                                   *
- *                       V       H                                         *
- ***************************************************************************/
-
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>

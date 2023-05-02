@@ -1,9 +1,3 @@
-/****************************************************************************
- * file - ip.h                                                              *
- ****************************************************************************/
-
-/* typedefs */
-
 typedef unsigned char *image_ptr;
 typedef double *double_ptr;
 typedef struct
@@ -52,12 +46,10 @@ typedef struct
 
 typedef struct 
     {
-    int number;             /* number of segments to follow */
+    int number;
     LINE_SEGMENT line[100];
-    char *filename; /* name of file holding the line list */
+    char *filename;
     } LINE_LIST;
-
-/* defines */
 
 #define PI   3.14159265358979323846
 #define CLIP(val, low, high) {if(val<low) val=low; if(val>high) val=high;}
@@ -69,4 +61,3 @@ typedef struct
 #define PBM 4
 #define PGM 5
 #define PPM 6
-

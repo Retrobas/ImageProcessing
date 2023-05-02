@@ -15,22 +15,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\List2_1.c">
+    <ClCompile Include="..\main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Iplib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\LIST2_2.C">
+    <ClCompile Include="..\histogram.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\convolve.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\LIST3_1.c">
+    <ClCompile Include="..\makeczp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\makeczp.c">
+    <ClCompile Include="..\lut.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

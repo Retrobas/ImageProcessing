@@ -1,76 +1,107 @@
-/***************************************************************************
- * File: iplib.c                                                           *
- *                                                                         *
- * Desc: general purpose image processing routines                         *
- ***************************************************************************/
-
-
 #include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "ip.h"
 
+image_ptr creat_pnm(int rows, int cols, int type);
 image_ptr read_pnm(char *filename, int *rows, int *cols, int *type);
-int getnum(FILE *fp);
+void write_pnm(image_ptr ptr, char *filename, int rows, int cols, int magic_number);
 
-/***************************************************************************
- * Func: read_pnm                                                          *
- *                                                                         *
- * Desc: reads a portable bitmap file                                      *
- *                                                                         *
- * Params: filename - name of image file to read                           *
- *         rows - number of rows in the image                              *
- *         cols - number of columns in the image                           *
- *         type - file type                                                *
- *                                                                         *
- * Returns: pointer to the image just read into memory                     *
- ***************************************************************************/
+// white spcae와 주석을 무시하고 숫자를 읽어온다.
+int getnum(FILE *fp)
+{
+	char c;
+	int result;
 
+	// white space 무시
+	do
+	{
+		c = getc(fp);
+	} while ((c == ' ') || (c == '\t') || (c == '\n') || (c == '\r'));
+
+	// 주석 무시
+	if ((c < '0') || (c > '9'))
+	{
+		if (c == '#')
+		{
+			// 주석이 나오면 계속 무시한다.
+			while (c == '#')
+			{
+				// 한 줄 무시
+				while (c != '\n')
+					c = getc(fp);
+				c = getc(fp);
+			}
+		}
+		// 숫자가 아니고 주석도 아니라면 오류
+		else
+		{
+			printf("Garbage in ASCII fields\n");
+			exit(1);
+		}
+	}
+
+	// 숫자 읽어오기
+	result = 0;
+	do
+	{
+		result = result * 10 + (c - '0');
+		c = getc(fp);
+	} while ((c >= '0') && (c <= '9'));
+
+	return result;
+}
+
+// 이진 파일인 RAWBITS PNM file 을 읽어와 char로 변환해 image_ptr을 내놓는 함수
+// 이미지 크기(cols, rows)와 (type)은 함수 내부에서 정해진다.
 image_ptr read_pnm(char *filename, int *rows, int *cols, int *type)
 {
-	int i;                     /* index variable */
-	int row_size;              /* size of image row in bytes */
-	int maxval;                /* maximum value of pixel */
-	FILE *fp;                  /* input file pointer */
-	int firstchar, secchar;    /* first 2 characters in the input file */
-	image_ptr ptr;             /* pointer to image buffer */
-	unsigned long offset;      /* offset into image buffer */
-	unsigned long total_size;  /* size of image in bytes */
-	unsigned long total_bytes; /* number of total bytes written to file */
-	float scale;               /* number of bytes per pixel */
+	int i;
+	int row_size;              
+	int maxval;                
+	FILE *fp;                  
+	int firstchar, secchar;    
+	image_ptr result;             
+	unsigned long offset;      
+	unsigned long total_size;  
+	unsigned long total_bytes; 
+	float scale;               
 
-	/* open input file */
+	// 이진 파일로 연다. (ASCII PNM인 P1, P2, P3는 고려하지 않음)
 	if ((fp = fopen(filename, "rb")) == NULL)
 	{
 		printf("Unable to open %s for reading\n", filename);
 		exit(1);
 	}
 
+	// Magic Number를 가져온다.
 	firstchar = getc(fp);
 	secchar = getc(fp);
+	*type = secchar - '0';
 
+	// Image size (ASCII) 를 저장한다.
+	*cols = getnum(fp);
+	*rows = getnum(fp);
+
+	// Magic Number는 P로 시작한다.
 	if (firstchar != 'P')
 	{
 		printf("You silly goof... This is not a PPM file!\n");
 		exit(1);
 	}
 
-	*cols = getnum(fp);
-	*rows = getnum(fp);
-	*type = secchar - '0';
-
 	switch (secchar)
 	{
 	case '4':            /* PBM */
-		scale = 0.125;
+		scale = 0.125;	 // pixel 당 1bit [0, 1]
 		maxval = 1;
 		break;
 	case '5':            /* PGM */
-		scale = 1.0;
+		scale = 1.0;	 // pixel 당 1byte [0, 256)
 		maxval = getnum(fp);
 		break;
 	case '6':             /* PPM */
-		scale = 3.0;
+		scale = 3.0;	 // pixel 당 3bytes [0, 256) x 3
 		maxval = getnum(fp);
 		break;
 	default:             /* Error */
@@ -79,25 +110,26 @@ image_ptr read_pnm(char *filename, int *rows, int *cols, int *type)
 		break;
 	}
 
+	// Image size (byte) 를 저장한다.
 	row_size = (*cols) * scale;
 	total_size = (unsigned long)(*rows) * row_size;
 
-	ptr = (image_ptr)IP_MALLOC(total_size);
-
-	if (ptr == NULL)
+	// 이미지를 읽어와 저장한다.
+	result = (image_ptr)IP_MALLOC(total_size);
+	if (result == NULL)
 	{
 		printf("Unable to malloc %lu bytes\n", total_size);
 		exit(1);
 	}
-
 	total_bytes = 0;
 	offset = 0;
 	for (i = 0; i < (*rows); i++)
 	{
-		total_bytes += fread(ptr + offset, 1, row_size, fp);
+		total_bytes += fread(result + offset, 1, row_size, fp);
 		offset += row_size;
 	}
 
+	// 잘못 읽어왔다면 오류처리
 	if (total_size != total_bytes)
 	{
 		printf("Failed miserably trying to read %ld bytes\nRead %ld bytes\n",
@@ -106,79 +138,19 @@ image_ptr read_pnm(char *filename, int *rows, int *cols, int *type)
 	}
 
 	fclose(fp);
-	return ptr;
+	return result;
 }
 
-/***************************************************************************
- * Func: getnum                                                            *
- *                                                                         *
- * Desc: reads an ASCII number from a portable bitmap file header          *
- *                                                                         *
- * Param: fp - pointer to file being read                                  *
- *                                                                         *
- * Returns: the number read                                                *
- ***************************************************************************/
-
-int getnum(FILE *fp)
+// char인 image_ptr을 이진 파일인 RAWBITS PNM file로 변경하는 함수
+void write_pnm(image_ptr ptr, char *filename, int rows, int cols, int magic_number)
 {
-	char c;               /* character read in from file */
-	int i;                /* number accumulated and returned */
-
-	do
-	{
-		c = getc(fp);
-	} while ((c == ' ') || (c == '\t') || (c == '\n') || (c == '\r'));
-
-	if ((c < '0') || (c > '9'))
-		if (c == '#')                   /* chew off comments */
-		{
-			while (c == '#')
-			{
-				while (c != '\n')
-					c = getc(fp);
-				c = getc(fp);
-			}
-		}
-		else
-		{
-			printf("Garbage in ASCII fields\n");
-			exit(1);
-		}
-
-	i = 0;
-	do
-	{
-		i = i * 10 + (c - '0');         /* convert ASCII to int */
-		c = getc(fp);
-	} while ((c >= '0') && (c <= '9'));
-
-	return i;
-}
-
-/***************************************************************************
- * Func: write_pnm                                                         *
- *                                                                         *
- * Desc: writes out a portable bitmap file                                 *
- *                                                                         *
- * Params: ptr - pointer to image in memory                                *
- *         filename _ name of file to write image to                       *
- *         rows - number of rows in the image                              *
- *         cols - number of columns in the image                           *
- *         magic_number - number that defines what type of file it is      *
- *                                                                         *
- * Returns: nothing                                                        *
- ***************************************************************************/
-
-void write_pnm(image_ptr ptr, char *filename, int rows,
-	int cols, int magic_number)
-{
-	FILE *fp;             /* file pointer for output file */
-	long offset;          /* current offset into image buffer */
-	long total_bytes;     /* number of bytes written to output file */
-	long total_size;      /* size of image buffer */
-	int row_size;         /* size of row in bytes */
-	int i;                /* index variable */
-	float scale;          /* number of bytes per image pixel */
+	FILE *fp;             
+	long offset;          
+	long total_bytes;     
+	long total_size;      
+	int row_size;         
+	int i;                
+	float scale;          
 
 	switch (magic_number)
 	{
@@ -197,18 +169,20 @@ void write_pnm(image_ptr ptr, char *filename, int rows,
 		break;
 	}
 
-	/* open new output file */
 	if ((fp = fopen(filename, "wb")) == NULL)
 	{
 		printf("Unable to open %s for output\n", filename);
 		exit(1);
 	}
 
-	/* print out the portable bitmap header */
+	// Magic Number와 이미지 크기 쓰기
 	fprintf(fp, "P%d\n%d %d\n", magic_number, cols, rows);
-	if (magic_number != 4)
+
+	// bitmap file이 아니라면 level은 255로 고정
+	if (magic_number != 4)	
 		fprintf(fp, "255\n");
 
+	// 크기 설정 후 이미지 저장
 	row_size = cols * scale;
 	total_size = (long)row_size * rows;
 	offset = 0;
@@ -220,28 +194,59 @@ void write_pnm(image_ptr ptr, char *filename, int rows,
 	}
 
 	if (total_bytes != total_size)
-		printf("Tried to write %ld bytes...Only wrote %ld\n",
-			total_size, total_bytes);
+		printf("Tried to write %ld bytes...Only wrote %ld\n", total_size, total_bytes);
 
 	fclose(fp);
 }
 
-/****************************************************************************
- * Func: pnm_open                                                           *
- *                                                                          *
- * Desc: opens a pnm file and determines rows, cols, and maxval             *
- *                                                                          *
- * Params: rows- pointer to number of rows in the image                     *
- *         cols - pointer number of columns in the image                    *
- *         maxval - pointer to max value                                    *
- *         filename - name of image file                                    *
- ****************************************************************************/
+// 빈 PNM 이미지를 만든다.
+image_ptr creat_pnm(int rows, int cols, int type)
+{
+	int i;
+	int row_size;
+	image_ptr result;
+	unsigned long total_size;
+	float scale;
 
+	// Magic Number에 따른 scale값을 결정한다.
+	switch (type)
+	{
+	case 4:            /* PBM */
+		scale = 0.125;	 // pixel 당 1bit [0, 1]
+		break;
+	case 5:            /* PGM */
+		scale = 1.0;	 // pixel 당 1byte [0, 256)
+		break;
+	case 6:             /* PPM */
+		scale = 3.0;	 // pixel 당 3bytes [0, 256) x 3
+		break;
+	default:             /* Error */
+		printf("creat_pnm: This is not a Portable bitmap RAWBITS file\n");
+		exit(1);
+		break;
+	}
+
+	// Image size (byte) 를 저장한다.
+	row_size = cols * scale;
+	total_size = (unsigned long)(rows) * row_size;
+
+	// 이미지를 읽어와 저장한다.
+	result = (image_ptr)IP_MALLOC(total_size);
+	if (result == NULL)
+	{
+		printf("Unable to malloc %lu bytes\n", total_size);
+		exit(1);
+	}
+
+	return result;
+}
+
+// RAWBITS PNM file 의 이미지 크기, 스케일값을 결정하고
+// 헤더를 제외한 실제 읽어야 하는 파일의 시작부분을 반환하는 함수
 FILE *pnm_open(int *rows, int *cols, int *maxval, char *filename)
 {
 	int firstchar, secchar;
 	float scale;
-	unsigned long row_size;
 	FILE *fp;
 
 	if ((fp = fopen(filename, "rb")) == NULL)
@@ -282,20 +287,9 @@ FILE *pnm_open(int *rows, int *cols, int *maxval, char *filename)
 		break;
 	}
 
-	row_size = (*cols) * scale;
 	return fp;
 }
 
-
-/****************************************************************************
- * Func: read_mesh                                                          *
- *                                                                          *
- * Desc: reads mesh data into a mesh structure				    *
- *                                                                          *
- * Params: filename - name of input mesh file                               *
- *                                                                          *
- * Returns: mesh structure storing width, height, x data  and y data        *
- ****************************************************************************/
 mesh *read_mesh(char *filename)
 {
 	FILE *fp;

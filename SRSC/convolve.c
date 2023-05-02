@@ -3,23 +3,6 @@
 #include <malloc.h>
 #include "ip.h"
 
-
-/***************************************************************************
- * Func: convolve                                                          *
- *                                                                         *
- * Desc: convolves an image with the floating point kernel passed  and     *
- *       writes out new image one line at a time                           *
- *                                                                         *
- * Params: source - pointer to image in memory                             *
- *         cols - number of columns in image                               *
- *         rows - number of rows in image                                  *
- *         kwidth - width of convolution kernel                            *
- *         kheight - height of convolution kernel                          *
- *         kernel - pointer to convolution kernel                          *
- *         bias - value to add to convolution sum                          *
- *         filename - name of output file                                  *
- ***************************************************************************/
-
 void convolve(image_ptr source, int cols, int rows, int kwidth, int kheight,
 	float *kernel, int bias, char *filename);
 
