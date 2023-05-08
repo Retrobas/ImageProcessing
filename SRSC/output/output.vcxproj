@@ -82,6 +82,7 @@
     <ClCompile Include="..\main.c" />
     <ClCompile Include="..\histogram.c" />
     <ClCompile Include="..\makeczp.c" />
+    <ClCompile Include="..\median_filt.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\IP.H" />

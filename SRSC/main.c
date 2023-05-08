@@ -19,6 +19,9 @@ void change_CDF(image_ptr buffer, unsigned long number_of_pixels);
 extern void convolve(image_ptr source, int cols, int rows, int kwidth, int kheight, float *kernel, int bias, char *filename);
 extern void makeczp(image_ptr buffer, int rows, int cols, int V, int H);
 
+void median_filt(image_ptr source, int cols, int rows, char *filename, int side);
+void mean_filt(image_ptr source, int cols, int rows, char *filename, int side);
+
 void change_pgm();
 void processing_LUT();
 void creat_LUT();
@@ -32,9 +35,7 @@ void creat_zone_plate();
 
 int main(int argc, char *argv[])
 {
-	// HE: processing_HE();
-	// Histogram: creat_histogram();
-	// CDF: creat_CDF();
+	processing_convolution();
 	return 0;
 }
 
@@ -209,6 +210,69 @@ void processing_convolution()
 	float highpassFilter[3][3] = { {-1.0 / 9, -1.0 / 9, -1.0 / 9}, {-1.0 / 9, 8.0 / 9, -1.0 / 9}, {-1.0 / 9, -1.0 / 9, -1.0 / 9} };
 	float sharpeningFilter[3][3] = { {-1, -1, -1}, {-1, 9, -1}, {-1, -1, -1} };
 
+	float prewittGx[3][3] = { {-1, -1, -1}, {0, 0, 0}, {1, 1, 1} };
+	float prewittGy[3][3] = { {-1, 0, 1}, {-1, 0, 1}, {-1, 0, 1} };
+
+	float sobelGx[3][3] = { {-1, -2, -1}, {0, 0, 0}, {1, 2, 1} };
+	float sobelGy[3][3] = { {-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1} };
+	
+	// 9시방향부터 시계방향
+	float compassPrewitt[8][3][3] =
+	{
+		{{ -1, 1, 1 }, {-1, -2, 1}, {-1, 1, 1}},
+		{{ -1, -1, 1 }, {-1, -2, 1}, {1, 1, 1}},
+		{{-1, -1, -1}, {1, -2, 1}, {1, 1, 1}},
+		{{1, -1, -1}, {1, -2, -1}, {1, 1, 1} },
+		{{1, 1, -1}, {1, -2, -1}, {1, 1, -1}},
+		{{1, 1, 1}, {1, -2, -1}, {1, -1, -1}},
+		{{1, 1, 1}, {1, -2, 1}, {-1, -1, -1}},
+		{{1, 1, 1}, {-1, -2, 1}, {-1, -1, 1}}
+	};
+
+	float compassKirsh[8][3][3] =
+	{
+		{{-3, -3, 5}, {-3, 0, 5}, {-3, -3, 5}},
+		{{-3, -3, -3}, {-3, 0, 5}, {-3, 5, 5}},
+		{{-3, -3, -3}, {-3, 0, -3}, {5, 5, 5}},
+		{{-3, -3, -3}, {5, 0, -3}, {5, 5, -3}},
+		{{5, -3, -3}, {5, 0, -3}, {5, -3, -3}},
+		{{5, 5, -3}, {5, 0, -3}, {-3, -3, -3}},
+		{{5, 5, 5}, {-3, 0, -3}, {-3, -3, -3}},
+		{{-3, 5, 5}, {-3, 0, 5}, {-3, -3, -3}}
+	};
+
+	float compassRobinson3[8][3][3] =
+	{
+		{{-1, 0, 1}, {-1, 0, 1}, {-1, 0, 1}},
+		{{-1, -1, 0}, {-1, 0, 1}, {0, 1, 1}},
+		{{-1, -1, -1}, {0, 0, 0}, {1, 1, 1}},
+		{{0, -1, -1}, {1, 0, -1}, {1, 1, 0}},
+		{{1, 0, -1}, {1, 0, -1}, {1, 0, -1}},
+		{{1, 1, 0}, {1, 0, -1}, {0, -1, -1}},
+		{{1, 1, 1}, {0, 0, 0}, {-1, -1, -1}},
+		{{0, 1, 1}, {-1, 0, 1}, {-1, -1, 0}}
+	};
+
+	float compassRobinson5[8][3][3] =
+	{
+		{{-1, 0, 1}, {-2, 0, 2}, {-1, 0, 1}},
+		{{-2, -1, 0}, {-1, 0, 1}, {0, 1, 2}},
+		{{-1, -2, -1}, {0, 0, 0}, {1, 2, 1}},
+		{{0, -1, -2}, {1, 0, -1}, {2, 1, 0}},
+		{{1, 0, -1}, {2, 0, -2}, {1, 0, -1}},
+		{{2, 1, 0}, {1, 0, -1}, {0, -1, -2}},
+		{{1, 2, 1}, {0, 0, 0}, {-1, -2, -1}},
+		{{0, 1, 2}, {-1, 0, 1}, {-2, -1, 0}}
+	};
+
+	float LoG[5][5] = {
+		{0, 0, -1, 0, 0},
+		{0, -1, -2, -1, 0},
+		{-1, -2, 16, -2, -1},
+		{0, -1, -2, -1, 0},
+		{0, 0, -1, 0, 0}
+	};
+
 	printf("input name of input file\n");
 	gets(filein);
 
@@ -224,7 +288,10 @@ void processing_convolution()
 		bytes_per_pixel = 1;
 	number_of_pixels = (bytes_per_pixel) * (rows) * (cols);
 
-	convolve(buffer, cols, rows, 3, 3, sharpeningFilter, 0, fileout);
+	//convolve(buffer, cols, rows, 5, 5, LoG, 0, fileout);
+	median_filt(buffer, cols, rows, fileout, 3);
+	//mean_filt(buffer, cols, rows, fileout, 3);
+
 	IP_FREE(buffer);
 }
 
