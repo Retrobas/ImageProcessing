@@ -4,6 +4,7 @@
 #include <math.h>
 #include "ip.h"
 
+#pragma region extern function
 extern image_ptr creat_pnm(int rows, int cols, int type);
 extern image_ptr read_pnm(char *filename, int *rows, int *cols, int *type);
 extern void write_pnm(image_ptr ptr, char *filename, int rows, int cols, int magic_number);
@@ -18,7 +19,12 @@ void change_CDF(image_ptr buffer, unsigned long number_of_pixels);
 
 extern void convolve(image_ptr source, int cols, int rows, int kwidth, int kheight, float *kernel, int bias, char *filename);
 extern void makeczp(image_ptr buffer, int rows, int cols, int V, int H);
+extern void nearest_neighbor_interpolation(image_ptr buffer, char *fileout, int rows, int cols, float x_scale, float y_scale, int type);
+void bilinear_interpolation(image_ptr buffer, char *fileout, int rows, int cols, float x_scale, float y_scale, int type);
 
+#pragma endregion
+
+#pragma region main function
 void median_filt(image_ptr source, int cols, int rows, char *filename, int side);
 void mean_filt(image_ptr source, int cols, int rows, char *filename, int side);
 
@@ -32,10 +38,39 @@ void creat_CDF();
 
 void processing_convolution();
 void creat_zone_plate();
+#pragma endregion
+
 
 int main(int argc, char *argv[])
 {
-	processing_convolution();
+	char filein[100];
+	char fileout[100];
+	int rows, cols, type;
+	image_ptr buffer = NULL;
+	unsigned long bytes_per_pixel;
+	unsigned long number_of_pixels;
+
+	// 콘솔 입력
+	printf("Input name of input file\n");
+	gets(filein);
+
+	printf("\nInput name of output file\n");
+	gets(fileout);
+	printf("\n");
+
+	// 이진파일을 char로 읽어온다.
+	buffer = read_pnm(filein, &rows, &cols, &type);
+
+	// 이미지 타입에 따른 크기 설정
+	if (type == PPM)
+		bytes_per_pixel = 3;
+	else
+		bytes_per_pixel = 1;
+	number_of_pixels = (bytes_per_pixel) * (rows) * (cols);
+
+	nearest_neighbor_interpolation(buffer, fileout, rows, cols, 2, 2, type);
+
+	IP_FREE(buffer);
 	return 0;
 }
 
