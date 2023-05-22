@@ -15,13 +15,16 @@ extern int solarizing(int value);
 
 extern void histogram_equalize(image_ptr buffer, unsigned long number_of_pixels);
 extern void change_histogram(image_ptr buffer, unsigned long number_of_pixels);
-void change_CDF(image_ptr buffer, unsigned long number_of_pixels);
+extern void change_CDF(image_ptr buffer, unsigned long number_of_pixels);
 
 extern void convolve(image_ptr source, int cols, int rows, int kwidth, int kheight, float *kernel, int bias, char *filename);
 extern void makeczp(image_ptr buffer, int rows, int cols, int V, int H);
 extern void nearest_neighbor_interpolation(image_ptr buffer, char *fileout, int rows, int cols, float x_scale, float y_scale, int type);
-void bilinear_interpolation(image_ptr buffer, char *fileout, int rows, int cols, float x_scale, float y_scale, int type);
+extern void bilinear_interpolation(image_ptr buffer, char *fileout, int rows, int cols, float x_scale, float y_scale, int type);
 
+extern void frame_processing(char *file1, char *file2, char *fileout);
+
+void ConvertBMPtoPGN(char *filename, char *fileout);
 #pragma endregion
 
 #pragma region main function
@@ -38,39 +41,29 @@ void creat_CDF();
 
 void processing_convolution();
 void creat_zone_plate();
-#pragma endregion
 
+void processing_nearest_neighor_interpolation();
+void processing_frame();
+#pragma endregion
 
 int main(int argc, char *argv[])
 {
 	char filein[100];
 	char fileout[100];
-	int rows, cols, type;
 	image_ptr buffer = NULL;
+	BITMAPHEADER header;
 	unsigned long bytes_per_pixel;
 	unsigned long number_of_pixels;
 
-	// 콘솔 입력
-	printf("Input name of input file\n");
+	printf("Input name of input file (bmp)\n");
 	gets(filein);
 
-	printf("\nInput name of output file\n");
+	printf("\nInput name of output file (pgm)\n");
 	gets(fileout);
 	printf("\n");
 
-	// 이진파일을 char로 읽어온다.
-	buffer = read_pnm(filein, &rows, &cols, &type);
+	ConvertBMPtoPGN(filein, fileout);
 
-	// 이미지 타입에 따른 크기 설정
-	if (type == PPM)
-		bytes_per_pixel = 3;
-	else
-		bytes_per_pixel = 1;
-	number_of_pixels = (bytes_per_pixel) * (rows) * (cols);
-
-	nearest_neighbor_interpolation(buffer, fileout, rows, cols, 2, 2, type);
-
-	IP_FREE(buffer);
 	return 0;
 }
 
@@ -382,4 +375,56 @@ void creat_CDF()
 	write_pnm(buffer, fileout, 256, 256, 5);	// 크기가 256 x 256 인 CDF 생성
 
 	IP_FREE(buffer);
+}
+
+void processing_nearest_neighor_interpolation() {
+	char filein[100];
+	char fileout[100];
+	int rows, cols, type;
+	image_ptr buffer = NULL;
+	unsigned long bytes_per_pixel;
+	unsigned long number_of_pixels;
+
+	// 콘솔 입력
+	printf("Input name of input file\n");
+	gets(filein);
+
+	printf("\nInput name of output file\n");
+	gets(fileout);
+	printf("\n");
+
+	// 이진파일을 char로 읽어온다.
+	buffer = read_pnm(filein, &rows, &cols, &type);
+
+	// 이미지 타입에 따른 크기 설정
+	if (type == PPM)
+		bytes_per_pixel = 3;
+	else
+		bytes_per_pixel = 1;
+	number_of_pixels = (bytes_per_pixel) * (rows) * (cols);
+
+	nearest_neighbor_interpolation(buffer, fileout, rows, cols, 2, 2, type);
+
+}
+
+void processing_frame()
+{
+	char file1[100];
+	char file2[100];
+	char fileout[100];
+	int rows, cols, type;
+	image_ptr buffer = NULL;
+	unsigned long bytes_per_pixel;
+	unsigned long number_of_pixels;
+
+	// 콘솔 입력
+	printf("Input name of first input file\n");
+	gets(file1);
+	printf("Input name of second input file\n");
+	gets(file2);
+	printf("\nInput name of output file\n");
+	gets(fileout);
+	printf("\n");
+
+	frame_processing(file1, file2, fileout);
 }

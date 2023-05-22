@@ -77,6 +77,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\convolve.c" />
+    <ClCompile Include="..\frame_proc.c" />
+    <ClCompile Include="..\get_bmphead.c" />
     <ClCompile Include="..\Iplib.c" />
     <ClCompile Include="..\interpolation.c" />
     <ClCompile Include="..\lut.c" />

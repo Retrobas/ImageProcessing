@@ -39,6 +39,12 @@
     <ClCompile Include="..\interpolation.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\frame_proc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\get_bmphead.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\IP.H">

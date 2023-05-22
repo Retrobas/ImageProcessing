@@ -51,6 +51,28 @@ typedef struct
     char *filename;
     } LINE_LIST;
 
+typedef unsigned short int USHORT;
+typedef unsigned long int  ULONG;
+
+typedef struct {
+    USHORT bmpType;                       // BMP 파일의 종류를 나타내는 식별자
+    ULONG  bmpSize;                       // BMP 파일의 크기(바이트 단위)
+    USHORT bmpReserved1;                  // 예약
+    USHORT bmpReserved2;                  // 예약
+    ULONG  bmpOffset;                     // 이미지 정보가 시작되는 위치(Offset)
+    ULONG  bmpHeaderSize;                 // Header의 크기(바이트 단위)
+    ULONG  bmpWidth;                      // 가로 크기(픽셀 단위)
+    ULONG  bmpHeight;                     // 세로 크기(픽셀 단위)
+    USHORT bmpPlanes;                     // Color Plane의 수(1로 셋팅)
+    USHORT bmpBitCount;                   // 한 픽셀에 할당된 비트수
+    ULONG  bmpCompression;                // 압축 기법 사용여부
+    ULONG  bmpBitmapSize;                 // 비트맵 이미지의 크기
+    ULONG  bmpXPelsPerMeter;              // 수평 해상도
+    ULONG  bmpYPelsPerMeter;              // 수직 해상도
+    ULONG  bmpColors;                     // 사용된 색상수
+    ULONG  bmpClrImportant;
+} BITMAPHEADER;
+
 #define PI   3.14159265358979323846
 #define CLIP(val, low, high) {if(val<low) val=low; if(val>high) val=high;}
 #define CLAMP(val, low, high) ((val<low) ? low : ((val>high) ? high : val))

@@ -197,20 +197,20 @@ void cubic_convolution_interpolation(image_ptr buffer, char *fileout, int rows, 
 			unsigned char nextY = buffer[(Y_Source + 1) * cols + X_Source];
 
 			// col 보간
-			float EWtop1 = (a + 2) * pow(X_Source, 3) - (a + 3) * pow(X_Source, 2) + 1;
-			float EWbottom1 = SW1 + EWweight * (SE1 - SW1);
+			//float EWtop1 = (a + 2) * pow(X_Source, 3) - (a + 3) * pow(X_Source, 2) + 1;
+			//float EWbottom1 = SW1 + EWweight * (SE1 - SW1);
 
 			// row 보간
-			float result = (unsigned long)(EWbottom + NSweight * (EWtop - EWbottom));
+			//float result = (unsigned long)(EWbottom + NSweight * (EWtop - EWbottom));
 
-			if (type == 5)      /* PGM */
-				line_buff[index++] = result;
-			else               /* PPM */
-			{
-				line_buff[index++] = color_buff[source_index].r;
-				line_buff[index++] = color_buff[source_index].g;
-				line_buff[index++] = color_buff[source_index].b;
-			}
+			//if (type == 5)      /* PGM */
+			//	line_buff[index++] = result;
+			//else               /* PPM */
+			//{
+			//	line_buff[index++] = color_buff[source_index].r;
+			//	line_buff[index++] = color_buff[source_index].g;
+			//	line_buff[index++] = color_buff[source_index].b;
+			//}
 		}
 		fwrite(line_buff, 1, line, fp);
 	}
