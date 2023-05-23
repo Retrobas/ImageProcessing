@@ -18,31 +18,31 @@
     <ClCompile Include="..\main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Iplib.c">
+    <ClCompile Include="..\pnm.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\histogram.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\convolve.c">
+    <ClCompile Include="..\convolution.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\makeczp.c">
+    <ClCompile Include="..\zone_plate.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\lut.c">
+    <ClCompile Include="..\point_processing.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\median_filt.c">
+    <ClCompile Include="..\nonlinear_filter.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\interpolation.c">
+    <ClCompile Include="..\image_scaling.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\frame_proc.c">
+    <ClCompile Include="..\frame_processing.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\get_bmphead.c">
+    <ClCompile Include="..\bmp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,8 +1,111 @@
+#include <stdio.h>
+#include <malloc.h>
 #include "ip.h"
 
+// create image
+void process_HE();
+void creat_histogram();
+void creat_CDF();
+
+// process histogram
 void histogram_equalize(image_ptr buffer, unsigned long number_of_pixels);
 void change_histogram(image_ptr buffer, unsigned long number_of_pixels);
 void change_CDF(image_ptr buffer, unsigned long number_of_pixels);
+
+// extern function
+extern image_ptr creat_pnm(int rows, int cols, int type);
+extern image_ptr read_pnm(char *filename, int *rows, int *cols, int *type);
+extern void write_pnm(image_ptr ptr, char *filename, int rows, int cols, int magic_number);
+
+void process_HE()
+{
+	char filein[100];
+	char fileout[100];
+	int rows, cols, type;
+	image_ptr buffer = NULL;
+	unsigned long bytes_per_pixel;
+	unsigned long number_of_pixels;
+
+	printf("Input name of input file\n");
+	gets(filein);
+
+	printf("\nInput name of output file\n");
+	gets(fileout);
+	printf("\n");
+
+	buffer = read_pnm(filein, &rows, &cols, &type);
+
+	if (type == PPM)
+		bytes_per_pixel = 3;
+	else
+		bytes_per_pixel = 1;
+	number_of_pixels = (bytes_per_pixel) * (rows) * (cols);
+
+	histogram_equalize(buffer, number_of_pixels);
+	write_pnm(buffer, fileout, rows, cols, type);
+
+	IP_FREE(buffer);
+}
+
+void creat_histogram()
+{
+	char filein[100];
+	char fileout[100];
+	int rows, cols, type;
+	image_ptr buffer = NULL;
+	unsigned long bytes_per_pixel;
+	unsigned long number_of_pixels;
+
+	printf("Input name of input file\n");
+	gets(filein);
+
+	printf("\nInput name of output file\n");
+	gets(fileout);
+	printf("\n");
+
+	buffer = read_pnm(filein, &rows, &cols, &type);
+
+	if (type == PPM)
+		bytes_per_pixel = 3;
+	else
+		bytes_per_pixel = 1;
+	number_of_pixels = (bytes_per_pixel) * (rows) * (cols);
+
+	change_histogram(buffer, number_of_pixels);
+	write_pnm(buffer, fileout, 256, 256, 5);	// 农扁啊 256 x 256 牢 histogram 积己
+
+	IP_FREE(buffer);
+}
+
+void creat_CDF()
+{
+	char filein[100];
+	char fileout[100];
+	int rows, cols, type;
+	image_ptr buffer = NULL;
+	unsigned long bytes_per_pixel;
+	unsigned long number_of_pixels;
+
+	printf("Input name of input file\n");
+	gets(filein);
+
+	printf("\nInput name of output file\n");
+	gets(fileout);
+	printf("\n");
+
+	buffer = read_pnm(filein, &rows, &cols, &type);
+
+	if (type == PPM)
+		bytes_per_pixel = 3;
+	else
+		bytes_per_pixel = 1;
+	number_of_pixels = (bytes_per_pixel) * (rows) * (cols);
+
+	change_CDF(buffer, number_of_pixels);
+	write_pnm(buffer, fileout, 256, 256, 5);	// 农扁啊 256 x 256 牢 CDF 积己
+
+	IP_FREE(buffer);
+}
 
 void histogram_equalize(image_ptr buffer, unsigned long number_of_pixels)
 {

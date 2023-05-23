@@ -6,13 +6,18 @@
 #include <math.h>
 #include "ip.h" 
 
-#define frame_operation(X1, X2) X1 + X2
-
+// extern function
+extern image_ptr creat_pnm(int rows, int cols, int type);
+extern image_ptr read_pnm(char *filename, int *rows, int *cols, int *type);
 extern int getnum(FILE *fp);
 
-void frame_processing(char *file1, char *file2, char *fileout);
+// creat image
+void process_frame(int (*frame_operation)(int, int));
 
-void frame_processing(char *file1, char *file2, char *fileout)
+// process frame processing
+void frame_processing(char *file1, char *file2, char *fileout, int (*frame_operation)(int, int));
+
+void frame_processing(char *file1, char *file2, char *fileout, int (*frame_operation)(int, int))
 {
 	int rows, cols;                     /* image rows and columns */
 	unsigned long i, j;                  /* x and y loop variables */
@@ -130,4 +135,26 @@ void frame_processing(char *file1, char *file2, char *fileout)
 	fclose(fp2);
 	fclose(fpout);
 	return 0;
+}
+
+void process_frame(int (*frame_operation)(int, int))
+{
+	char file1[100];
+	char file2[100];
+	char fileout[100];
+	int rows, cols, type;
+	image_ptr buffer = NULL;
+	unsigned long bytes_per_pixel;
+	unsigned long number_of_pixels;
+
+	// 콘솔 입력
+	printf("Input name of first input file\n");
+	gets(file1);
+	printf("Input name of second input file\n");
+	gets(file2);
+	printf("\nInput name of output file\n");
+	gets(fileout);
+	printf("\n");
+
+	frame_processing(file1, file2, fileout, frame_operation);
 }

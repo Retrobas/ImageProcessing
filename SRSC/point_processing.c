@@ -1,9 +1,18 @@
+#include <stdio.h>
+#include <malloc.h>
 #include "ip.h"
 
+// create image
+void creat_LUT(int *operation(int));
+void process_LUT(int *operation(int));
+void change_pgm();
+
+// process LUT
 void apply_LUT(image_ptr buffer, unsigned long number_of_pixels, int *operation(int));
 void change_LUT(image_ptr buffer, unsigned long number_of_pixels, int *operation(int));
 void set_LUT(unsigned char *LUT, int *operation(int));
 
+// operation function
 int nullLUT(int value);
 int customLUT(int value);
 int gamma_collection(int value);
@@ -15,6 +24,101 @@ int thresholding(int value);
 int bounded_thresholding(int value);
 int iso_intensity_contouring(int value);
 int solarizing(int value);
+
+// extern function
+extern image_ptr creat_pnm(int rows, int cols, int type);
+extern image_ptr read_pnm(char *filename, int *rows, int *cols, int *type);
+extern void write_pnm(image_ptr ptr, char *filename, int rows, int cols, int magic_number);
+
+void creat_LUT(int *operation(int))
+{
+	char fileout[100];
+	image_ptr buffer = NULL;
+	unsigned long bytes_per_pixel;
+	unsigned long number_of_pixels;
+
+	printf("Input name of output file\n");
+	gets(fileout);
+	printf("\n");
+
+	buffer = creat_pnm(256, 256, 5);
+	bytes_per_pixel = 1;
+	number_of_pixels = 256 * 256;
+
+	change_LUT(buffer, number_of_pixels, operation);
+	write_pnm(buffer, fileout, 256, 256, 5);
+	IP_FREE(buffer);
+}
+
+void process_LUT(int *operation(int))
+{
+	char filein[100];
+	char fileout[100];
+	int rows, cols, type;
+	image_ptr buffer = NULL;
+	unsigned long bytes_per_pixel;
+	unsigned long number_of_pixels;
+
+	printf("Input name of input file\n");
+	gets(filein);
+
+	printf("\nInput name of output file\n");
+	gets(fileout);
+	printf("\n");
+
+	buffer = read_pnm(filein, &rows, &cols, &type);
+
+	if (type == PPM)
+		bytes_per_pixel = 3;
+	else
+		bytes_per_pixel = 1;
+	number_of_pixels = (bytes_per_pixel) * (rows) * (cols);
+
+	apply_LUT(buffer, number_of_pixels, operation);
+	write_pnm(buffer, fileout, rows, cols, type);
+
+	IP_FREE(buffer);
+}
+
+void change_pgm()
+{
+	char filein[100];
+	char fileout[100];
+	int rows, cols, type;
+	image_ptr buffer = NULL;
+	unsigned long bytes_per_pixel;
+	unsigned long number_of_pixels;
+	int i, j;
+
+	printf("Input name of input file\n");
+	gets(filein);
+
+	printf("\nInput name of output file\n");
+	gets(fileout);
+	printf("\n");
+
+	buffer = read_pnm(filein, &rows, &cols, &type);
+
+	if (type == PPM)
+		bytes_per_pixel = 3;
+	else
+		bytes_per_pixel = 1;
+	number_of_pixels = (bytes_per_pixel) * (rows) * (cols);
+
+	for (i = 0; i < rows; ++i) {
+		for (j = 0; j < cols; ++j) {
+			//buffer[cols * i + j] = (float)j / (cols) * 255.0;
+			//buffer[cols * i + j] = (float)i / rows * 255.0;
+			//buffer[cols * i + j] = (float)(i + j);
+			//CLIP(buffer[cols * i + j], 0, 255);
+			if (i == 90 || i == 140 || j == 90 || j == 140) buffer[cols * i + j] = 255;
+		}
+	}
+
+	write_pnm(buffer, fileout, rows, cols, type);
+
+	IP_FREE(buffer);
+}
 
 void apply_LUT(image_ptr buffer, unsigned long number_of_pixels, int *operation(int))
 {

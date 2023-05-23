@@ -76,16 +76,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\convolve.c" />
-    <ClCompile Include="..\frame_proc.c" />
-    <ClCompile Include="..\get_bmphead.c" />
-    <ClCompile Include="..\Iplib.c" />
-    <ClCompile Include="..\interpolation.c" />
-    <ClCompile Include="..\lut.c" />
+    <ClCompile Include="..\convolution.c" />
+    <ClCompile Include="..\frame_processing.c" />
+    <ClCompile Include="..\bmp.c" />
+    <ClCompile Include="..\pnm.c" />
+    <ClCompile Include="..\image_scaling.c" />
+    <ClCompile Include="..\point_processing.c" />
     <ClCompile Include="..\main.c" />
     <ClCompile Include="..\histogram.c" />
-    <ClCompile Include="..\makeczp.c" />
-    <ClCompile Include="..\median_filt.c" />
+    <ClCompile Include="..\zone_plate.c" />
+    <ClCompile Include="..\nonlinear_filter.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\IP.H" />
