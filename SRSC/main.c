@@ -11,7 +11,7 @@ extern image_ptr read_pnm(char *filename, int *rows, int *cols, int *type);
 extern void write_pnm(image_ptr ptr, char *filename, int rows, int cols, int magic_number);
 
 // bmp.c
-void ConvertBMPtoPGN(char *filename, char *fileout);
+void ConvertBMPtoPGM(char *filename, char *fileout);
 
 // point_processing.c
 extern void process_LUT(int *operation(int));
@@ -38,29 +38,27 @@ extern void process_frame(int (*frame_operation)(int, int));
 // image_scaling.c
 extern void process_image_scaling(int process_type);
 
+extern void ConvertBMPtoPGM(char *filename, char *fileout);
+
 #pragma endregion
 
 int main(int argc, char *argv[])
 {
-	process_image_scaling(2);
-	//process_image_scaling(1);
-	//process_image_scaling(1);
+	char filein[100];
+	char fileout[100];
+	image_ptr buffer = NULL;
+	BITMAPHEADER header;
+	unsigned long bytes_per_pixel;
+	unsigned long number_of_pixels;
 
-	//char filein[100];
-	//char fileout[100];
-	//image_ptr buffer = NULL;
-	//BITMAPHEADER header;
-	//unsigned long bytes_per_pixel;
-	//unsigned long number_of_pixels;
+	printf("Input name of input file (bmp)\n");
+	gets(filein);
 
-	//printf("Input name of input file (bmp)\n");
-	//gets(filein);
+	printf("\nInput name of output file (pgm)\n");
+	gets(fileout);
+	printf("\n");
 
-	//printf("\nInput name of output file (pgm)\n");
-	//gets(fileout);
-	//printf("\n");
-
-	//ConvertBMPtoPGN(filein, fileout);
+	ConvertBMPtoPGM(filein, fileout);
 
 	return 0;
 }
