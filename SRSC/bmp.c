@@ -10,10 +10,20 @@
 extern image_ptr creat_pnm(int rows, int cols, int type);
 extern void write_pnm(image_ptr ptr, char *filename, int rows, int cols, int magic_number);
 
-void ConvertBMPtoPGM(char *filename, char *fileout);
+void ConvertBMPtoPGM();
 
-void ConvertBMPtoPGM(char *filename, char *fileout)
+void ConvertBMPtoPGM()
 {
+	char filename[100];
+	char fileout[100];
+
+	printf("Input name of input file (bmp)\n");
+	gets(filename);
+
+	printf("\nInput name of output file (pgm)\n");
+	gets(fileout);
+	printf("\n");
+
 	image_ptr buffer = NULL;
 	unsigned long bytes_per_pixel;
 	unsigned long number_of_pixels;

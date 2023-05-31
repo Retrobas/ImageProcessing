@@ -45,6 +45,9 @@
     <ClCompile Include="..\bmp.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\DFT_temp.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\IP.H">

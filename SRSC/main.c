@@ -38,27 +38,14 @@ extern void process_frame(int (*frame_operation)(int, int));
 // image_scaling.c
 extern void process_image_scaling(int process_type);
 
-extern void ConvertBMPtoPGM(char *filename, char *fileout);
+extern void ConvertBMPtoPGM();
+
+extern int MakeFFTImage();
 
 #pragma endregion
 
 int main(int argc, char *argv[])
 {
-	char filein[100];
-	char fileout[100];
-	image_ptr buffer = NULL;
-	BITMAPHEADER header;
-	unsigned long bytes_per_pixel;
-	unsigned long number_of_pixels;
-
-	printf("Input name of input file (bmp)\n");
-	gets(filein);
-
-	printf("\nInput name of output file (pgm)\n");
-	gets(fileout);
-	printf("\n");
-
-	ConvertBMPtoPGM(filein, fileout);
-
+	MakeFFTImage();
 	return 0;
 }
